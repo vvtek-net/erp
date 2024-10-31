@@ -1,0 +1,30 @@
+RewriteEngine On
+
+# Loại bỏ đuôi .php và .html
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^([^\.]+)$ $1.php [NC,L]
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.html -f
+RewriteRule ^([^\.]+)$ $1.html [NC,L]
+
+# Redirect từ URL có đuôi .php hoặc .html sang URL không có đuôi
+RewriteCond %{THE_REQUEST} \s/([^\s]+)\.php[\s?] [NC]
+RewriteRule ^ /%1 [R=301,L]
+
+RewriteCond %{THE_REQUEST} \s/([^\s]+)\.html[\s?] [NC]
+RewriteRule ^ /%1 [R=301,L]
+
+# Redirect từ /index hoặc /index.php, /index.html sang /
+RewriteCond %{THE_REQUEST} /index(\.php|\.html)? [NC]
+RewriteRule ^(.*)index(\.php|\.html)?$ /$1 [R=301,L]
+
+# Thiết lập DirectoryIndex để xử lý index.php nếu không có tên file
+DirectoryIndex index.php
+
+# Xử lý URL dạng slug cho chi tiết tin tức
+RewriteRule ^([a-zA-Z0-9-]+)/?$ chi-tiet-tin.php?slug=$1 [L,QSA]
+
+# Xử lý lỗi 404
+ErrorDocument 404 /404.html

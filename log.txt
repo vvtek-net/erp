@@ -1,0 +1,19 @@
+#### Đã Sửa:
+    - Làm lại trang dashboard
+    - Trang 404 Not Found
+#### Cần sửa:
+    - Thanh header
+
+#### Đã Sửa
+    - Đã cập nhật favicon cho trang login và trang dashboard
+    - Thay đổi logo
+#### Cần Sửa
+    - Thêm câu lệnh 
+    <link rel="icon" href="assets/img/favicon.ico" type="image/x-icon"> 
+    vào các file còn lại để sửa favicon
+
+    - Thêm câu lệnh
+     <a class="navbar-brand" href="dashboard.php">
+            <img src="assets/img/logo.png" alt="Logo" style="height: 40px;">
+        </a>
+    Vào các file còn lại để giới hạn kích thước logl. Vì logo đang có kích thước to.
