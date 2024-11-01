@@ -12,6 +12,9 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// Lấy tên đầy đủ của user từ session
+$fullname = $_SESSION['fullname'];
+
 // all opportunities
 $opportunities = getAllOpportunities($conn);
 
@@ -58,6 +61,7 @@ if ($search_phone) {
     $stmt = $conn->prepare($total_sql);
     $stmt->bind_param("s", $search_phone_wildcard);
     $stmt->execute();
+    
     $total_result = $stmt->get_result();
     $total_rows = $total_result->fetch_assoc()['total'];
     $total_pages = ceil($total_rows / $limit);
@@ -171,6 +175,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['customer_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Khách Hàng Cơ Hội</title>
+    <link rel="icon" href="assets/img/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="assets/css/user_data.css">

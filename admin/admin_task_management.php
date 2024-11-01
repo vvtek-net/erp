@@ -225,40 +225,44 @@ $conn->close();
         <div class="row mb-3 p-3">
             <button class="btn btn-primary" data-toggle="modal" data-target="#addTaskModal">Thêm Task</button>
 
-            <div class="btn-group ml-3">
-                <button class="btn btn-secondary buttons-collection dropdown-toggle btn-outline-secondary waves-effect waves-light" 
+            <button class="btn btn-secondary buttons-collection btn-outline-secondary waves-effect waves-light ml-3" 
                 type="button" 
-                id="dropdownMenuButton" 
-                data-toggle="dropdown" 
-                aria-haspopup="true" 
-                aria-expanded="false">
+                id="uploadButton" 
+                data-toggle="modal" 
+                data-target="#uploadModal">
+                <span>
+                    <i class="fa-solid fa-upload"></i>
+                    <span class="d-none d-sm-inline-block">Upload</span>
+                </span>
+            </button>
+                
+            <div class="dropdown">
+                <button class="btn btn-secondary ml-3 buttons-collection btn-outline-secondary waves-effect waves-light dropdown-toggle" 
+                    type="button" 
+                    id="exportButtonDropdown" 
+                    data-toggle="dropdown" 
+                    aria-haspopup="true" 
+                    aria-expanded="false">
                     <span>
-                        <i class="fa-solid fa-download"></i>
-                        <span class="d-none d-sm-inline-block">Import </span>
+                        <i class="fa-solid fa-file-export"></i>
+                        <span class="d-none d-sm-inline-block">Export</span>
                     </span>
                 </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <!-- <a class="dt-button dropdown-item buttons-print" tabindex="0" aria-controls="DataTables_Table_0" href="#">
-                            <span>
-                                <i class="fa-solid fa-print mr-2"></i>Print
-                            </span>
-                        </a>  -->
-                        <a class="dt-button dropdown-item buttons-excel buttons-html5" tabindex="0" aria-controls="DataTables_Table_0" href="#">
-                            <span>
-                                <i class="fa-solid fa-file-excel mr-2"></i>Excel
-                            </span>
-                        </a> 
-                        
+                <div id="export-menu" class="dropdown-menu mt-2" aria-labelledby="exportButtonDropdown" style="min-width: 8rem;">
+                    <a id="export-to-excel" class="dropdown-item" href="#">
+                        <i class="fa-regular fa-file-excel mr-2"></i>
+                        Excel
+                    </a>
+                    <a id="export-to-pdf" class="dropdown-item" href="#">
+                        <i class="fa-regular fa-file-pdf mr-2"></i>
+                        Pdf
+                    </a>
                 </div>
-                <!-- <form id="uploadForm" enctype="multipart/form-data" action="">
-                    <input type="file" name="file" id="file" accept=".xlsx, .xls">
-                    <button type="submit" id="submitFile" class="btn btn-success">Upload</button>
-                </form> -->
-                <form action="" method="post" enctype="multipart/form-data">
-                    <input type="file"  name="filepath" id="filepath"/>
-                    <input type="submit" name="SubmitButton"/>
+                <form action="src/generate_file.php" method="GET" id="export-form">
+                    <input type="hidden" name="exportType" id="hidden-type" value="">
                 </form>
             </div>
+
         </div>
         
         <div class="table-container">
@@ -478,6 +482,32 @@ $conn->close();
         </div>
     </div>
 
+    <!-- Modal upload file -->
+     <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTaskModalLabel">
+                        <i class="mr-2 fa-solid fa-upload"></i>
+                        Upload
+                        <small>(.xlsx .csv)</small>
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <input type="file" name="filepath" id="filepath"/>
+                    </div>
+                    <div class="modal-footer">
+                        <input class="btn btn-primary" type="submit" name="SubmitButton"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Thêm Bootstrap JS và jQuery -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
@@ -506,33 +536,21 @@ $conn->close();
         });
     </script>
 
-    <!-- upload file -->
-    <script>
-        document.querySelector('.buttons-excel').addEventListener('click', function () {
-            document.getElementById('file').click();
-        });
-
-        document.getElementById('file').addEventListener('change', function () {
-            document.getElementById('uploadForm').style.display = 'block';
-        });
-
-        document.getElementById('uploadForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            let formData = new FormData(this);
-
-            fetch('upload.php', {
-                method: 'POST',
-                body: formData
+    <!-- export -->
+    <script type="text/javascript">
+        $(document).ready(function() {
+            jQuery('#export-menu a').bind("click", function() {
+                
+                var target = $(this).attr('id');
+                console.log(target)
+                switch (target) {
+                    case 'export-to-excel':
+                        $('#hidden-type').val(target);
+                        $('#export-form').submit();
+                        break;
+                }
             })
-            .then(response => response.text())
-            .then(data => {
-                alert(data);
-                document.getElementById('uploadForm').reset();
-                document.getElementById('uploadForm').style.display = 'none';
-            })
-            .catch(error => console.error('Error:', error));
-        });
-
+        })
     </script>
 
 </body>

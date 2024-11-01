@@ -77,6 +77,7 @@ $conn->close();
 
 <head>
     <title>Ticket Management</title>
+    <link rel="icon" href="assets/img/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="assets/css/sale.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 </head>

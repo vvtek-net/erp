@@ -29,11 +29,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $phone = $_POST['phone'];
     $description = $_POST['description'];
     $status = $_POST['status'];
+
     $source_id = $_POST['source_id'];
     
     // Cập nhật dữ liệu
     $stmt = $conn->prepare("UPDATE data SET name = ?, phone = ?, description = ?, status = ?, sources_id = ? WHERE data_id = ?");
-    $stmt->bind_param("sssisi", $name, $phone, $description, $status, $source_id, $data_id);
+    $stmt->bind_param("sssssi", $name, $phone, $description, $status, $source_id, $data_id);
     if ($stmt->execute()) {
         $msg = "Dữ liệu đã được cập nhật thành công!";
     } else {
@@ -55,6 +56,7 @@ $source_query = "SELECT id, source_name FROM data_sources";
 $sources = $conn->query($source_query);
 
 $conn->close();
+
 ?>
 
 <!DOCTYPE html>
@@ -94,7 +96,12 @@ $conn->close();
 
             <div class="form-group">
                 <label for="status">Trạng thái</label>
-                <input type="text" class="form-control" id="status" name="status" value="<?php echo htmlspecialchars($data['status']); ?>" required>
+                <!-- <input type="text" class="form-control" id="status" name="status" value="<?php echo htmlspecialchars($data['status']); ?>" required> -->
+                
+                <select class="form-control" id="status" name="status">
+                    <option value="called" <?php if ($data["status"] == "called") echo "selected" ?>>called</option>
+                    <option value="pending" <?php if ($data["status"] == "pending") echo "selected" ?>>pending</option>
+                </select>
             </div>
 
             <div class="form-group">

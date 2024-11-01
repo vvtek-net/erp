@@ -87,6 +87,7 @@ $conn->close();
 
 <head>
     <title>Tìm Kiếm Số Điện Thoại || Index</title>
+    <link rel="icon" href="assets/img/favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/index.css">

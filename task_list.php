@@ -23,12 +23,31 @@ $fullname = $_SESSION['fullname'];
 $user_id = $_SESSION['user_id'];
 $role = $_SESSION['role'];
 
+// Xử lý phân trang
+$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10; // Số lượng bản ghi trên mỗi trang
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1; // Trang hiện tại
+$offset = ($page - 1) * $limit; // Vị trí bắt đầu của bản ghi trên trang hiện tại
+
 // Lấy danh sách các task
-$sql = "SELECT task_id, title, description, status, start_date, end_date, created_at 
-        FROM tasks 
-        WHERE assign_id = $user_id
-        ORDER BY created_at DESC";
-$result = $conn->query($sql);
+$total_sql = "SELECT COUNT(*) as total FROM tasks 
+                WHERE assign_id = $user_id";
+$stmt = $conn->prepare($total_sql);
+$stmt->execute();
+
+// phân trang
+$total_result = $stmt->get_result();
+$total_rows = $total_result->fetch_assoc()['total'];
+$total_pages = ceil($total_rows / $limit);
+
+$sql = "SELECT task_id, title, description, status, start_date, end_date, created_at FROM tasks 
+        WHERE assign_id = $user_id  
+        ORDER BY created_at 
+        DESC LIMIT ?, ?";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ii", $offset, $limit);
+$stmt->execute();
+$result = $stmt->get_result();
 
 // update
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['task_status']) && isset($_POST['task_id'])) {
@@ -56,6 +75,7 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Danh Sách Task</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="icon" href="assets/img/favicon.ico" type="image/x-icon">
     <style>
         .container {
             margin-top: 50px;
@@ -145,6 +165,40 @@ $conn->close();
                     <?php endif; ?>
                 </tbody>
             </table>
+            <!-- Phân trang -->
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                    <?php if ($page > 1): ?>
+                        <li class="page-item"><a class="page-link" href="task_list?page=<?php echo $page - 1; ?>&limit=<?php echo $limit; ?>">Trước</a></li>
+                    <?php endif; ?>
+
+                    <?php
+                    $start_page = max(1, $page - 2);
+                    $end_page = min($total_pages, $page + 2);
+
+                    if ($start_page > 1) {
+                        echo '<li class="page-item"><a class="page-link" href="task_list?page=1&limit=' . $limit . '">1</a></li>';
+                        if ($start_page > 2) {
+                            echo '<li class="page-item"><span class="page-link">...</span></li>';
+                        }
+                    }
+
+                    for ($i = $start_page; $i <= $end_page; $i++): ?>
+                        <li class="page-item <?php if ($i == $page) echo 'active'; ?>"><a class="page-link" href="task_list?page=<?php echo $i; ?>&limit=<?php echo $limit; ?>"><?php echo $i; ?></a></li>
+                    <?php endfor; ?>
+
+                    <?php if ($end_page < $total_pages): ?>
+                        <?php if ($end_page < $total_pages - 1): ?>
+                            <li class="page-item"><span class="page-link">...</span></li>
+                        <?php endif; ?>
+                        <li class="page-item"><a class="page-link" href="task_list?page=<?php echo $total_pages; ?>&limit=<?php echo $limit; ?>"><?php echo $total_pages; ?></a></li>
+                    <?php endif; ?>
+
+                    <?php if ($page < $total_pages): ?>
+                        <li class="page-item"><a class="page-link" href="task_list?page=<?php echo $page + 1; ?>&limit=<?php echo $limit; ?>">Sau</a></li>
+                    <?php endif; ?>
+                </ul>
+            </nav>
         </div>
     </div>
 

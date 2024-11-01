@@ -133,7 +133,7 @@ $conn->close();
                     <?php endforeach; ?>
                     <?php else:?>
                     <tr>
-                        <td colspan="7" class="text-center">Chưa có khách hàng nào liên hệ.</td>
+                        <td colspan="8" class="text-center">Chưa có khách hàng nào liên hệ.</td>
                     </tr>
                     <?php endif; ?>
             </tbody>
