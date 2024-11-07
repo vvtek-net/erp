@@ -1,0 +1,87 @@
+p {
+  margin: 0;
+  padding: 0;
+}
+.ft00 {
+  font-size: 17px;
+  font-family: BCDEEE + Calibri;
+  color: #000000;
+}
+.ft01 {
+  font-size: 11px;
+  font-family: BCDFEE + Calibri;
+  color: #000000;
+}
+.ft02 {
+  font-size: 12px;
+  font-family: BCDEEE + Calibri;
+  color: #000000;
+}
+.ft03 {
+  font-size: 11px;
+  font-family: BCDGEE + Calibri;
+  color: #000000;
+}
+.ft04 {
+  font-size: 11px;
+  font-family: BCDEEE + Calibri;
+  color: #000000;
+}
+.ft05 {
+  font-size: 13px;
+  font-family: BCDHEE + Calibri;
+  color: #000000;
+}
+.ft06 {
+  font-size: 14px;
+  font-family: BCDIEE + Calibri;
+  color: #000000;
+}
+.ft07 {
+  font-size: 13px;
+  font-family: BCDIEE + Calibri;
+  color: #000000;
+}
+.ft08 {
+  font-size: 13px;
+  font-family: BCDJEE + Calibri;
+  color: #000000;
+}
+.ft09 {
+  font-size: 17px;
+  font-family: BCDIEE + Calibri;
+  color: #000000;
+}
+.ft010 {
+  font-size: 13px;
+  font-family: BCDEEE + Calibri;
+  color: #000000;
+}
+.ft011 {
+  font-size: 15px;
+  font-family: ArialMT;
+  color: #000000;
+}
+.ft012 {
+  font-size: 13px;
+  font-family: BCDFEE + Calibri;
+  color: #000000;
+}
+.ft013 {
+  font-size: 13px;
+  font-family: Arial;
+  color: #000000;
+}
+.ft014 {
+  font-size: 17px;
+  font-family: BCDHEE + Calibri;
+  color: #000000;
+}
+.ft015 {
+  font-size: 13px;
+  font-family: BCDKEE + Wingdings;
+  color: #000000;
+}
+.bsd {
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}

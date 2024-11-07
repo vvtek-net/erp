@@ -66,8 +66,9 @@ function validateDate($date, $format = 'Y-m-d')
     return $d && $d->format($format) == $date;
 }
 
-function convertFormatDate($date, $format) {
-    
+function convertFormatDate($date, $format = 'Y-m-d') {
+    $d = DateTime::createFromFormat($format, $date);
+    return $d->format($format);
 }
 
 ?>

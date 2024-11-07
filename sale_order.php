@@ -55,6 +55,22 @@ $addons = array_slice($all_addons, 0, 5); // Lấy 5 addons đầu tiên
 
 $sale_order_id = isset($_GET['sale_order_id']) ? $_GET['sale_order_id'] : null;
 
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['service_id']) && isset( $_POST['addon_id'])) {
+    $customer_id = $_POST['customer_id'];
+    $service_id = $_POST['service_id'];
+    $addon_id = $_POST['addon_id'];
+    $service_duration = $_POST['service_duration'];
+    $user_id = $_SESSION['user_id']; // Lấy ID của user từ session (người dùng đã đăng nhập)
+
+    $sql = "INSERT INTO sale_orders (customer_id, service_type, addon_type, service_duration, created_by, created_at, status) 
+            VALUES (?,?,?,?,?,NOW(), 'pending');";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("iiiii", $customer_id, $service_id, $addon_id, $service_duration, $user_id);
+    $stmt->execute();
+    header("Location: sale_order_management.php?msg=success");
+}
+
 $conn->close();
 
 ?>
@@ -103,7 +119,7 @@ $conn->close();
     <?php include('topmenu.php'); ?>
     <div class="container mt-5">
         <h1 class="h1 fw-bolder">Create Sale Order</h1>
-        <form method="post" action="save_sale_order.php">
+        <form method="post" action="">
             <div class="mb-3">
                 <label for="customer_id" class="form-label">Select Customer:</label>
                 <select id="customer_id" class="form-select" name="customer_id" required>
@@ -123,11 +139,6 @@ $conn->close();
             </div>
 
             <div class="mb-3">
-                <label for="website_template_link" class="form-label">Website Template Link:</label>
-                <input type="text" class="form-control" id="website_template_link" name="website_template_link" required>
-            </div>
-
-            <div class="mb-3">
                 <label for="service_duration" class="form-label">Service Duration (Months):</label>
                 <input type="number" class="form-control" id="service_duration" name="service_duration" required>
             </div>
@@ -137,8 +148,8 @@ $conn->close();
                 <select id="service_id" class="form-select" name="service_id" required>
                     <option value="">Select services...</option>
                     <?php foreach ($services as $service): ?>
-                        <option value="<?php echo $service['id']; ?>">
-                            <?php echo $service['service_name']; ?> - <?php echo number_format($service['price'], 0, ',', '.'); ?> VND
+                        <option value="<?php echo $service['service_id']; ?>">
+                            <?php echo $service['service_name']; ?> - <?php echo $service['price']; ?> VND
                         </option>
                     <?php endforeach; ?>
                     <option value="search_more_services">Search More...</option>
@@ -150,8 +161,8 @@ $conn->close();
                 <select id="addon_id" class="form-select" name="addon_id" required>
                     <option value="">Select addons...</option>
                     <?php foreach ($addons as $addon): ?>
-                        <option value="<?php echo $addon['id']; ?>">
-                            <?php echo $addon['addon_name']; ?> - <?php echo number_format($addon['price'], 0, ',', '.'); ?> VND
+                        <option value="<?php echo $addon['addon_id']; ?>">
+                            <?php echo $addon['addon_name']; ?> - <?php echo $addon['price']; ?> VND
                         </option>
                     <?php endforeach; ?>
                     <option value="search_more_addons">Search More...</option>

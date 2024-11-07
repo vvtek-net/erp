@@ -149,6 +149,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
     <title>Dữ liệu khách hàng của <?php echo htmlspecialchars($fullname); ?></title>
     <link rel="icon" href="assets/img/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
@@ -163,41 +164,8 @@ $conn->close();
 </head>
 
 <body>
-
-    <!--  toast -->
-    <?php if (isset($_GET['status']) && $_GET['status'] === 'success'): ?>
-        <div class="toast-container position-fixed bottom-0 end-0 p-3">
-            <div class="toast d-flex toast--success" style="
-                  animation: 0.3s ease 0s 1 normal none running slideInLeft,
-                  1s linear 5s 1 normal forwards running fadeOut;">
-                <div class="toast__icon">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <div class="toast__body">
-                    <h3 class="toast__title mb-0">Khách hàng đã được thêm thành công!</h3>
-                </div>
-                <div class="toast__close" onclick="this.parentElement.style.display='none';">
-                    <i class="fas fa-times"></i>
-                </div>
-            </div>
-        </div>
-    <?php elseif (isset($_GET['status']) && $_GET['status'] === 'error'): ?>
-        <div class="toast-container position-fixed bottom-0 end-0 p-3">
-            <div class="toast d-flex toast--error" style="
-                  animation: 0.3s ease 0s 1 normal none running slideInLeft,
-                  1s linear 5s 1 normal forwards running fadeOut;">
-                <div class="toast__icon">
-                    <i class="fas fa-exclamation-circle"></i>
-                </div>
-                <div class="toast__body">
-                    <h3 class="toast__title mb-0"><?php echo htmlspecialchars($_GET['message']); ?></h3>
-                </div>
-                <div class="toast__close" onclick="this.parentElement.style.display='none';">
-                    <i class="fas fa-times"></i>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
+    <!-- toast -->
+    <?php include 'toasts.php' ?>
 
     <!-- Top Menu -->
     <nav class="navbar navbar-expand-lg navbar-custom">
@@ -223,7 +191,7 @@ $conn->close();
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="user_data.php">Quản lý data</a>
                         <a class="dropdown-item" href="data_manager.php">Telesale</a>
-                        <a class="dropdown-item" href="sale_order.php">Sale Orders</a>
+                        <a class="dropdown-item" href="sale_order_management.php">Sale Orders</a>
                         <a class="dropdown-item" href="opportunities.php">Khách hàng cơ hội</a>
                     </div>
                 </li>
@@ -233,14 +201,6 @@ $conn->close();
 
     <div class="container">
         <h2>Dữ liệu khách hàng của <?php echo htmlspecialchars($fullname); ?></h2>
-
-        <?php if (isset($_GET['msg']) && $_GET['msg'] == 'updated'): ?>
-            <div class="alert alert-success">Khách hàng đã được cập nhật thành công!</div>
-        <?php endif; ?>
-
-        <?php if (isset($_GET['msg']) && $_GET['msg'] == 'deleted'): ?>
-            <div class="alert alert-success">Khách hàng đã được xóa thành công!</div>
-        <?php endif; ?>
 
         <div class="d-flex justify-content-between mb-3">
             <a href="create.php" class="btn btn-success">Thêm khách hàng</a>
@@ -273,6 +233,7 @@ $conn->close();
             </form>
         </div>
 
+        <!-- data -->
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -307,10 +268,21 @@ $conn->close();
                                     </button>
                                     <div class="mt-2 dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
                                         <a class="dropdown-item pe-auto" data-target="#confirmCreate" data-customer-id="<?php echo $row['id']; ?>" class="btn btn-primary btn-sm" data-toggle="modal">Tạo KH cơ hội</a>
-                                        <button type="button" class="dropdown-item pe-auto" class="btn btn-warning btn-sm edit-btn"
+                                        <button type="button" class="dropdown-item pe-auto btn btn-warning edit-btn"
                                             data-id="<?php echo $row['id']; ?>"
                                             data-name="<?php echo htmlspecialchars($row['customer_name']); ?>"
                                             data-phone="<?php echo htmlspecialchars($row['phone_number']); ?>"
+                                            data-customer-type="<?php echo htmlspecialchars($row['customer_type']); ?>"
+
+                                            data-email="<?php echo htmlspecialchars($row['email']) ?>"
+                                            data-address="<?php echo htmlspecialchars($row['address']) ?>"
+                                            data-birthday="<?php echo htmlspecialchars($row['birthday']) ?>"
+                                            data-founding-date="<?php echo htmlspecialchars($row['founding_date']) ?>"
+                                            data-agent-name="<?php echo htmlspecialchars($row['agent_name']) ?>"
+                                            data-agent-position="<?php echo htmlspecialchars($row['agent_position']) ?>"
+                                            data-tax="<?php echo htmlspecialchars($row['tax']) ?>"
+                                            data-identity-person="<?php echo htmlspecialchars($row['identity_person']) ?>"
+
                                             data-source="<?php echo htmlspecialchars($row['data_source']); ?>"
                                             data-status="<?php echo htmlspecialchars($row['contact_status']); ?>"
                                             data-evaluation="<?php echo htmlspecialchars($row['customer_evaluation']); ?>"
@@ -381,14 +353,79 @@ $conn->close();
                     <form id="editCustomerForm" method="GET" action="update_customer.php">
 
                         <input type="hidden" id="editCustomerId" name="customer_id" value="">
-                        <div class="form-group">
-                            <label for="customer_name">Tên khách hàng</label>
-                            <input type="text" class="form-control" id="editCustomerName" name="customer_name" required>
+                        <input type="hidden" id="editCustomerType" name="customer_type">
+
+                        <!-- individual -->
+                        <div id="individualForm">
+                            <div class="form-group">
+                                <label for="customer_name">Tên khách hàng</label>
+                                <input type="text" class="form-control" id="editCustomerName" name="customer_name_individual" placeholder="Nhập tên khách hàng...">
+                            </div>
+                            <div class="form-row">
+                                <div class="col-6 form-group">
+                                    <label for="identity_person">Số CCCD/Số hộ chiếu: <span style="color: red">*</span></label>
+                                    <input class="form-control" type="text" name="identity_person" id="identity_person" placeholder="Nhập CCCD/passport..." >
+                                </div>
+                                <div class="col-6 form-group">
+                                    <label for="birthday">Ngày Sinh:</label>
+                                    <input class="form-control" type="date" name="birthday" id="birthday">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-6 form-group">
+                                    <label for="phone_number_individual">Số Điện Thoại: <span style="color: red">*</span></label>
+                                    <input class="form-control" type="text" name="phone_number_individual" id="phone_number_individual" placeholder="Nhập số điện thoại..." >
+                                </div>
+                                <div class="col-6 form-group">
+                                    <label for="email_individual">Email: <span style="color: red">*</span></label>
+                                    <input class="form-control" type="email" name="email_individual" id="email_individual" placeholder="Nhập email..." >
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="phone_number">Số điện thoại</label>
-                            <input type="text" class="form-control" id="editPhoneNumber" name="phone_number" required>
+                        <!-- business -->
+                        <div id="businessForm" style="display: none">
+                            <div class="form-group">
+                                <label for="customer_name">Tên Doanh Nghiệp: <span style="color: red">*</span></label>
+                                <input class="form-control" type="text" name="customer_name_business" id="customer_name_business" placeholder="Nhập tên doanh nghiệp..." >
+                            </div>
+                            <div class="form-row">
+                                <div class="col-6 form-group">
+                                    <label for="agent_name">Người Đại Diện Công Ty: <span style="color: red">*</span></label>
+                                    <input class="form-control" type="text" name="agent_name" id="agent_name" placeholder="Nhập người đại diện..." >
+                                </div>
+                                <div class="col-6 form-group">
+                                    <label for="agent_position">Chức Vụ: <span style="color: red">*</span></label>
+                                    <input class=" form-control" type="text" name="agent_position" id="agent_position" placeholder="Nhập chức vụ..." >
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-6 form-group">
+                                    <label for="tax">Mã Số Thuế: <span style="color: red">*</span></label>
+                                    <input class="form-control" type="text" name="tax" id="tax" placeholder="Nhập tax..." >
+                                </div>
+                                <div class="col-6 form-group">
+                                    <label for="birthday">Ngày Thành Lập: <span style="color: red">*</span></label>
+                                    <input class="form-control" type="date" name="founding_date" id="founding_date" >
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-6 form-group">
+                                    <label for="phone_number">Số ĐT: <span style="color: red">*</span></label>
+                                    <input class="form-control" type="text" name="phone_number_business" id="phone_number_business" placeholder="Nhập số điện thoại..." >
+                                </div>
+                                <div class="col-6 form-group">
+                                    <label for="email_business">Email: <span style="color: red">*</span></label>
+                                    <input class="form-control" type="email" name="email_business" id="email_business" placeholder="Nhập email..." >
+                                </div>
+                            </div>
                         </div>
+                        
+                        <div class="form-group">
+                            <label for="address">Địa chỉ: <span style="color: red">*</span></label>
+                            <input type="text" class="form-control" id="address" name="address">
+                        </div>
+
+                        <!-- thông tin khác -->
                         <div class="form-group">
                             <label for="data_source">Nguồn data</label>
                             <select class="form-control" id="editDataSource" name="data_source" required>
@@ -450,13 +487,50 @@ $conn->close();
                 var id = $(this).data('id');
                 var name = $(this).data('name');
                 var phone = $(this).data('phone');
+                var customerType = $(this).data('customer-type')
                 var source = $(this).data('source');
                 var status = $(this).data('status');
                 var evaluation = $(this).data('evaluation');
 
+                var email = $(this).data('email');
+                var address = $(this).data('address');
+                var birthday = $(this).data('birthday');
+                var foundingDate = $(this).data('founding-date');
+                var identityPerson = $(this).data('identity-person');
+                var tax = $(this).data('tax');
+                var agentName = $(this).data('agent-name');
+                var agentPosition = $(this).data('agent-position');
+
+                console.log(address)
+
+                // check customer's type
+                if (customerType === 'individual') {
+                    $('#individualForm').show();
+                    $('#businessForm').hide();
+                } else if (customerType === 'business') {
+                    $('#businessForm').show();
+                    $('#individualForm').hide();
+                }
+
+                // individual
+                $('#editCustomerType').val(customerType);
                 $('#editCustomerId').val(id);
                 $('#editCustomerName').val(name);
-                $('#editPhoneNumber').val(phone);
+                $('#phone_number_individual').val(phone);
+                $('#birthday').val(birthday)
+                $('#identity_person').val(identityPerson)
+                $('#email_individual').val(email)
+
+                // business
+                $('#customer_name_business').val(name)
+                $('#agent_name').val(agentName)
+                $('#agent_position').val(agentPosition)
+                $('#email_business').val(email)
+                $('#phone_number_business').val(phone)
+                $('#tax').val(tax)
+                $('#founding_date').val(foundingDate)
+
+                $('#address').val(address)
                 $('#editDataSource').val(source);
                 $('#editContactStatus').val(status);
                 $('#editCustomerEvaluation').val(evaluation);
@@ -472,30 +546,11 @@ $conn->close();
                     dataType: 'json',
                     success: function(response) {
                         if (response.status === 'success') {
-                            $('#editCustomerModal .modal-body').prepend(
-                                '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
-                                response.message +
-                                '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-                                '<span aria-hidden="true">&times;</span>' +
-                                '</button>' +
-                                '</div>'
-                            );
-                            setTimeout(function() {
-                                location.reload();
-                            }, 1000);
-                        } else {
-                            $('#editCustomerModal .modal-body').prepend(
-                                '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
-                                response.message +
-                                '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-                                '<span aria-hidden="true">&times;</span>' +
-                                '</button>' +
-                                '</div>'
-                            );
-                        }
+                            window.location.href = 'user_data.php?msg=updated'
+                        } 
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        alert('Có lỗi xảy ra: ' + textStatus);
+                        window.location.href = 'user_data.php?msg=error'
                     }
                 });
             });
